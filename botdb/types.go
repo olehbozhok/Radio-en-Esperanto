@@ -42,7 +42,7 @@ func (p *PodcastType) BeforeSave() (err error) {
 		return
 	}
 	var count = 0
-	connDB.Select("nil").Model(PodcastType{}).Where("href = ?", p.Href).Count(&count)
+	connDB.Model(&PodcastType{}).Where("href = ?", p.Href).Count(&count)
 	fmt.Println("count: ", count)
 	if count > 0 {
 		err = errors.New("podkast is exist")
