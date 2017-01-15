@@ -5,11 +5,11 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	//_ "github.com/mattn/go-sqlite3"
 )
-var DEBUG   bool = false
-var connDB    *gorm.DB
 
+var DEBUG bool = true
+var connDB *gorm.DB
 
-func Initdb(args ...interface{}) (*gorm.DB)  {
+func Initdb(args ...interface{}) *gorm.DB {
 	//err := os.Remove("db.sqlite3")
 	//if err != nil {
 	//	fmt.Println(err)
@@ -21,7 +21,7 @@ func Initdb(args ...interface{}) (*gorm.DB)  {
 	}
 	connDB = db
 
-	//db.LogMode(DEBUG)
+	db.LogMode(DEBUG)
 
 	err = db.DB().Ping()
 	if err != nil {
@@ -32,3 +32,8 @@ func Initdb(args ...interface{}) (*gorm.DB)  {
 
 	return db
 }
+
+//
+//func UpdatePodkasts() {
+//
+//}

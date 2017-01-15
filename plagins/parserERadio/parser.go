@@ -1,16 +1,20 @@
 package parserERadio
 
 import (
-	"time"
+	"github.com/Oleg-MBO/Radio-en-Esperanto-in-tg/botdb"
 	"golang.org/x/net/html"
 	"net/http"
-	"strings"
 	"regexp"
-	"github.com/Oleg-MBO/Radio-en-Esperanto-in-tg/botdb"
-	"fmt"
+	"strings"
+	"time"
 )
+
+func init() {
+	botdb.RegisterCallback(botdb.CallbackGetpodcasts{"ParserRadio", GetLastPodcasts})
+}
+
 // parser http://esperanto-radio.com/m
-const urlpodkasts  = `http://esperanto-radio.com/m`
+const urlpodkasts = `http://esperanto-radio.com/m`
 
 type PodkastType struct {
 	Date        time.Time
@@ -21,27 +25,25 @@ type PodkastType struct {
 
 var RegexpDataAndChannel = regexp.MustCompile(`(\d\d\d\d-\d\d-\d\d)\s(.*)`)
 
-
 var podcastsMap map[string]*botdb.PodcastChannelType
 
-func init()  {
+func init() {
 	podcastsMap = make(map[string]*botdb.PodcastChannelType)
 }
 
-
-func getPodkastChannelIfExist(podkastname string) (*botdb.PodcastChannelType) {
+func getPodkastChannelIfExist(podkastname string) *botdb.PodcastChannelType {
 	if val, ok := podcastsMap[podkastname]; ok {
 		return val
 	} else {
-		return &botdb.PodcastChannelType{ChannelName:podkastname}
+		return &botdb.PodcastChannelType{ChannelName: podkastname}
 	}
 }
 
-func GetLastPodcasts() (podcasts []botdb.PodcastType) {
+func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
 	resp, err := http.Get(urlpodkasts)
 
 	if err != nil {
-		return podcasts
+		return podcasts, err
 	}
 
 	b := resp.Body
@@ -50,7 +52,7 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType) {
 	z := html.NewTokenizer(b)
 
 	var (
-		indiv bool
+		indiv  bool
 		status int
 	)
 
@@ -65,7 +67,7 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType) {
 		case tt == html.StartTagToken:
 			t := z.Token()
 
-			switch  {
+			switch {
 			case inCorrectDiv(t):
 				indiv = true
 			case indiv && t.Data == "a":
@@ -91,13 +93,13 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType) {
 					//parse time and channel
 					tmp := RegexpDataAndChannel.FindStringSubmatch(t.Data)
 					if len(tmp) == 3 {
+						podcast.RawDate = tmp[1]
 						t, err := time.Parse("2006-01-02", tmp[1])
 						if err != nil {
 							podcast.Date = t
 						}
-						//podcast.Channel = *getPodkastChannelIfExist( strings.TrimSpace( tmp[2] ) )
 						podcast.ChannelName = strings.TrimSpace(tmp[2])
-						fmt.Println(strings.TrimSpace(tmp[2]))
+						//fmt.Println(strings.TrimSpace(tmp[2]))
 					}
 					status = 3
 				case 3:
@@ -111,11 +113,11 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType) {
 			}
 		}
 	}
-	return podcasts
+	return podcasts, nil
 }
 
-func inCorrectDiv (t html.Token) bool {
-	if (t.Data == "div" ) {
+func inCorrectDiv(t html.Token) bool {
+	if t.Data == "div" {
 		for _, a := range t.Attr {
 			if a.Key == "id" && strings.HasPrefix(a.Val, "versio_") {
 				return true
@@ -125,9 +127,9 @@ func inCorrectDiv (t html.Token) bool {
 	return false
 }
 
-func setHrefPodcastFromToken(t html.Token, p *botdb.PodcastType) () {
+func setHrefPodcastFromToken(t html.Token, p *botdb.PodcastType) {
 	for _, a := range t.Attr {
-		if a.Key == "href"  {
+		if a.Key == "href" {
 			p.Href = a.Val
 		}
 	}
