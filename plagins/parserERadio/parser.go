@@ -1,43 +1,27 @@
 package parserERadio
 
 import (
-	"github.com/Oleg-MBO/Radio-en-Esperanto-in-tg/botdb"
 	"golang.org/x/net/html"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
-)
 
-func init() {
-	botdb.RegisterCallback(botdb.CallbackGetpodcasts{"ParserRadio", GetLastPodcasts})
-}
+	"github.com/Oleg-MBO/Radio-en-Esperanto/botdb"
+)
 
 // parser http://esperanto-radio.com/m
 const urlpodkasts = `http://esperanto-radio.com/m`
 
 type PodkastType struct {
-	Date        time.Time
-	Channel     string
+	RawDate     time.Time
+	ChannelName string
 	Description string
 	Href        string
 }
 
 var RegexpDataAndChannel = regexp.MustCompile(`(\d\d\d\d-\d\d-\d\d)\s(.*)`)
-
-var podcastsMap map[string]*botdb.PodcastChannelType
-
-func init() {
-	podcastsMap = make(map[string]*botdb.PodcastChannelType)
-}
-
-func getPodkastChannelIfExist(podkastname string) *botdb.PodcastChannelType {
-	if val, ok := podcastsMap[podkastname]; ok {
-		return val
-	} else {
-		return &botdb.PodcastChannelType{ChannelName: podkastname}
-	}
-}
 
 func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
 	resp, err := http.Get(urlpodkasts)
@@ -46,13 +30,17 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
 		return podcasts, err
 	}
 
-	b := resp.Body
-	defer b.Close() // close Body when the function returns
+	return parseLastPodcasts(resp.Body)
+}
 
-	z := html.NewTokenizer(b)
+func parseLastPodcasts(body io.ReadCloser) (podcasts []botdb.PodcastType, err error) {
+
+	defer body.Close() // close Body when the function returns
+
+	z := html.NewTokenizer(body)
 
 	var (
-		indiv  bool
+		inDiv  bool
 		status int
 	)
 
@@ -69,23 +57,23 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
 
 			switch {
 			case inCorrectDiv(t):
-				indiv = true
-			case indiv && t.Data == "a":
+				inDiv = true
+			case inDiv && t.Data == "a":
 				podcast = botdb.PodcastType{}
 				// parse podcast href
 
 				setHrefPodcastFromToken(t, &podcast)
 				status = 1
-			case indiv && t.Data == "strong" && status == 1:
+			case inDiv && t.Data == "strong" && status == 1:
 				status = 2
 			}
 		case tt == html.EndTagToken:
 			t := z.Token()
-			if indiv && t.Data == "div" {
-				indiv = false
+			if inDiv && t.Data == "div" {
+				inDiv = false
 			}
 		case tt == html.TextToken:
-			if indiv {
+			if inDiv {
 				t := z.Token()
 				t.Data = strings.TrimSpace(t.Data)
 				switch status {
@@ -94,10 +82,10 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
 					tmp := RegexpDataAndChannel.FindStringSubmatch(t.Data)
 					if len(tmp) == 3 {
 						podcast.RawDate = tmp[1]
-						t, err := time.Parse("2006-01-02", tmp[1])
-						if err != nil {
-							podcast.Date = t
-						}
+						//t, err := time.Parse("2006-01-02", tmp[1])
+						//if err != nil {
+						//	podcast.Date = t
+						//}
 						podcast.ChannelName = strings.TrimSpace(tmp[2])
 						//fmt.Println(strings.TrimSpace(tmp[2]))
 					}
