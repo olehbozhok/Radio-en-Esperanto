@@ -14,7 +14,3 @@ func Sendreply(m *models.Message, text string) (*messages.SendMessageOK, error) 
 		}),
 	)
 }
-
-//func ForwardMessage()  {
-//
-//}

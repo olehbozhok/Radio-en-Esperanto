@@ -1,12 +1,15 @@
-package tgApiHelper
+package tgApiHandlers
 
 import (
-	"github.com/Oleg-MBO/Radio-en-Esperanto/botdb"
-	"github.com/Oleg-MBO/Radio-en-Esperanto/tgApiHelper/callbackQuery"
-	"github.com/Oleg-MBO/Radio-en-Esperanto/tgApiHelper/message"
+	"time"
+
 	"github.com/azer/logger"
 	"github.com/olebedev/go-tgbot"
-	"time"
+
+	"github.com/Oleg-MBO/Radio-en-Esperanto/db"
+	"github.com/Oleg-MBO/Radio-en-Esperanto/parser"
+	"github.com/Oleg-MBO/Radio-en-Esperanto/tgApiHandlers/callbackQuery"
+	"github.com/Oleg-MBO/Radio-en-Esperanto/tgApiHandlers/message"
 )
 
 var logTg = logger.New("tgApiHelper")
@@ -39,7 +42,7 @@ func InitApi(token string, channelId string) *tgbot.Router {
 	Tgapi.Message("^/malaboni", Message.RmListPodkasts)
 	Tgapi.Message("^/list", Message.ListAllPodkasts)
 	Tgapi.Message("^/listo", Message.ListAllPodkasts)
-	Tgapi.Message("^.*", Message.AllText)
+	//Tgapi.Message("^.*", Message.AllText)
 
 	Tgapi.CallbackQuery(`^add_.+$`, callbackQuery.AddPodkastId)
 	Tgapi.CallbackQuery("^rm_.+$", callbackQuery.RmPodkastId)
@@ -51,26 +54,30 @@ func InitApi(token string, channelId string) *tgbot.Router {
 func PodkastsProcessing() {
 	defer func() {
 		if r := recover(); r != nil {
-			logTg.Error("recovered PodkastsProcessing: %#v", r)
+			logTg.Error("recovered PodkastsProcessing: %v and sleep 1 minute\n", r)
+			time.Sleep(1 * time.Minute)
 			go PodkastsProcessing()
 		}
 	}()
+
 	for {
 		logTg.Info("start parse podcasts")
-		for _, p := range botdb.GetNewPodcasts() {
-			logTg.Info("parse ")
-			if !p.IsUnique() {
-				logTg.Info("is not unique")
+		listPodcasts := parser.GetNewPodcasts()
+		logTg.Info("got %d podcasts", len(listPodcasts))
+		for _, p := range listPodcasts {
+			logTg.Info("parsing")
+			if botdb.IsPodcastExistByHref(p.Href) {
+				logTg.Info("podcast is exist with url:%s ", p.Href)
 				continue
 			}
-			logTg.Info("try parsed to send")
-			if cs := SendPodcastToChannelAndSave(&p); cs {
+			logTg.Info("try send parsed data ")
+			if cs := SendPodcastToChannelAndSave(p); cs {
 				logTg.Info("SendPodcastToChannelAndSave OK")
 				ForwardToAllChatsPodcast(p)
 			}
 			time.Sleep(time.Second * 3)
 		}
-		logTg.Info("finish parse podcasts, sleep")
+		logTg.Info("finish parse podcasts, sleep " + TimeDelayPodcastParse.String())
 		time.Sleep(TimeDelayPodcastParse)
 	}
 }

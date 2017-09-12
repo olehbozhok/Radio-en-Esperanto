@@ -2,17 +2,19 @@ package tgApiHelperTypes
 
 import (
 	"fmt"
-	"github.com/Oleg-MBO/Radio-en-Esperanto/botdb"
-	"github.com/olebedev/go-tgbot/models"
 	"io"
 	"strconv"
+
+	"github.com/olebedev/go-tgbot/models"
+
+	"github.com/Oleg-MBO/Radio-en-Esperanto/db"
 )
 
 // represent ReadCloser interface in bot-api
 type InputFile struct {
 	io.ReadCloser
 	FileName string
-	OK bool
+	OK       bool
 }
 
 func (i *InputFile) Name() string {
@@ -27,18 +29,18 @@ type CanSendToTelegramType struct {
 func AddKeyboardPaginage(kb *models.InlineKeyboardMarkup, page int) {
 	if page == 0 {
 		kb.InlineKeyboard = append(kb.InlineKeyboard, []*models.InlineKeyboardButton{
-			&models.InlineKeyboardButton{
+			{
 				Text:         ">>",
 				CallbackData: "pg" + strconv.Itoa(page+1), // + " " + act,
 			},
 		})
 	} else {
 		kb.InlineKeyboard = append(kb.InlineKeyboard, []*models.InlineKeyboardButton{
-			&models.InlineKeyboardButton{
+			{
 				Text:         "<<",
 				CallbackData: "pg" + strconv.Itoa(page-1), // + " " + act,
 			},
-			&models.InlineKeyboardButton{
+			{
 				Text:         ">>",
 				CallbackData: "pg" + strconv.Itoa(page+1), // + " " + act,
 			},
@@ -55,9 +57,9 @@ func AddInlineKeyboardAddListPodcasts(kb *models.InlineKeyboardMarkup, chatid in
 	}
 	for _, ch := range channels {
 		kb.InlineKeyboard = append(kb.InlineKeyboard, []*models.InlineKeyboardButton{
-			&models.InlineKeyboardButton{
-				Text:         ch.ChannelName,
-				CallbackData: fmt.Sprintf("add_%s", ch.ChannelName), //change Podcast
+			{
+				Text:         ch,
+				CallbackData: fmt.Sprintf("add_%s", ch), //change Podcast
 			},
 		})
 	}
@@ -72,9 +74,9 @@ func AddInlineKeyboardRmListPodcasts(kb *models.InlineKeyboardMarkup, chatid int
 	}
 	for _, ch := range channels {
 		kb.InlineKeyboard = append(kb.InlineKeyboard, []*models.InlineKeyboardButton{
-			&models.InlineKeyboardButton{
-				Text:         ch.Channel,
-				CallbackData: fmt.Sprintf("rm_%s", ch.Channel), //change Podcast
+			{
+				Text:         ch,
+				CallbackData: fmt.Sprintf("rm_%s", ch), //change Podcast
 			},
 		})
 	}
@@ -82,7 +84,7 @@ func AddInlineKeyboardRmListPodcasts(kb *models.InlineKeyboardMarkup, chatid int
 
 func addEmpty(kb *models.InlineKeyboardMarkup) {
 	kb.InlineKeyboard = append(kb.InlineKeyboard, []*models.InlineKeyboardButton{
-		&models.InlineKeyboardButton{
+		{
 			Text:         "malplene",
 			CallbackData: "0",
 		},

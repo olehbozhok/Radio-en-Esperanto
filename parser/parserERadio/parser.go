@@ -6,24 +6,18 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
+	//"time"
 
-	"github.com/Oleg-MBO/Radio-en-Esperanto/botdb"
+	//"github.com/Oleg-MBO/Radio-en-Esperanto/botdb"
+	"github.com/Oleg-MBO/Radio-en-Esperanto/db/models"
 )
 
 // parser http://esperanto-radio.com/m
 const urlpodkasts = `http://esperanto-radio.com/m`
 
-type PodkastType struct {
-	RawDate     time.Time
-	ChannelName string
-	Description string
-	Href        string
-}
-
 var RegexpDataAndChannel = regexp.MustCompile(`(\d\d\d\d-\d\d-\d\d)\s(.*)`)
 
-func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
+func GetLastPodcasts() (podcasts []models.Podkast, err error) {
 	resp, err := http.Get(urlpodkasts)
 
 	if err != nil {
@@ -33,7 +27,7 @@ func GetLastPodcasts() (podcasts []botdb.PodcastType, err error) {
 	return parseLastPodcasts(resp.Body)
 }
 
-func parseLastPodcasts(body io.ReadCloser) (podcasts []botdb.PodcastType, err error) {
+func parseLastPodcasts(body io.ReadCloser) (podcasts []models.Podkast, err error) {
 
 	defer body.Close() // close Body when the function returns
 
@@ -44,7 +38,7 @@ func parseLastPodcasts(body io.ReadCloser) (podcasts []botdb.PodcastType, err er
 		status int
 	)
 
-	podcast := botdb.PodcastType{}
+	podcast := models.Podkast{}
 	for {
 		tt := z.Next()
 
@@ -59,7 +53,7 @@ func parseLastPodcasts(body io.ReadCloser) (podcasts []botdb.PodcastType, err er
 			case inCorrectDiv(t):
 				inDiv = true
 			case inDiv && t.Data == "a":
-				podcast = botdb.PodcastType{}
+				podcast = models.Podkast{}
 				// parse podcast href
 
 				setHrefPodcastFromToken(t, &podcast)
@@ -115,7 +109,7 @@ func inCorrectDiv(t html.Token) bool {
 	return false
 }
 
-func setHrefPodcastFromToken(t html.Token, p *botdb.PodcastType) {
+func setHrefPodcastFromToken(t html.Token, p *models.Podkast) {
 	for _, a := range t.Attr {
 		if a.Key == "href" {
 			p.Href = a.Val

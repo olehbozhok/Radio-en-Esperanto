@@ -3,13 +3,16 @@ package Message
 import (
 	"bytes"
 	"github.com/AlekSi/pointer"
-	"github.com/Oleg-MBO/Radio-en-Esperanto/botdb"
+
 	"github.com/olebedev/go-tgbot"
 	"github.com/olebedev/go-tgbot/client/messages"
 	"github.com/olebedev/go-tgbot/models"
 
-	"github.com/Oleg-MBO/Radio-en-Esperanto/tgApiHelper/helperTypes"
+	"github.com/Oleg-MBO/Radio-en-Esperanto/db"
+	dbModels "github.com/Oleg-MBO/Radio-en-Esperanto/db/models"
+	"github.com/Oleg-MBO/Radio-en-Esperanto/tgApiHandlers/helperTypes"
 	"github.com/azer/logger"
+	"gopkg.in/volatiletech/null.v6"
 )
 
 var Tgapi *tgbot.Router
@@ -25,6 +28,7 @@ var helpmessage string = "Mi brodkastas dissendi certajn podkastojn en Esperanto
 	"mian kreanto estas @MrTrooper\n" +
 	"bonan auxskultadon!"
 
+// bind for /start command
 func StartMessage(c *tgbot.Context) error {
 	logMain.Info("c.Update.Message.Text: %s", c.Update.Message.Text)
 	// send greeting message back
@@ -43,8 +47,7 @@ func StartMessage(c *tgbot.Context) error {
 	return nil
 }
 
-//r.Message("^/list", func (c *tgbot.Context) error {
-// /add
+// bind for /add command
 func AddListPodkasts(c *tgbot.Context) error {
 	logMain.Info("c.Update.Message.Text: %s", c.Update.Message.Text)
 
@@ -67,14 +70,23 @@ func AddListPodkasts(c *tgbot.Context) error {
 	}
 	if resp != nil {
 		logMain.Info("resp.Payload.Result.MessageID:%d", resp.Payload.Result.MessageID)
-		botdb.ChatAddRmMessagePodcasts{
+		// update id message AddListPodkasts for chat
+		chMessId := dbModels.ChatAddRMMessagePodcast{
 			ChatID:   resp.Payload.Result.Chat.ID,
-			AddMsgID: &resp.Payload.Result.MessageID,
-		}.UpdateAddMsgID()
+			AddMSGID: null.NewInt64(resp.Payload.Result.MessageID, true),
+		}
+		//UPSERT
+		chMessId.UpsertGP([]string{
+			dbModels.ChatAddRMMessagePodcastColumns.AddMSGID,
+		},
+			dbModels.ChatAddRMMessagePodcastColumns.ChatID,
+			dbModels.ChatAddRMMessagePodcastColumns.AddMSGID,
+		)
 	}
 	return nil
 }
 
+// bind for /rm command
 func RmListPodkasts(c *tgbot.Context) error {
 	logMain.Info("c.Update.Message.Text: %s", c.Update.Message.Text)
 
@@ -97,11 +109,19 @@ func RmListPodkasts(c *tgbot.Context) error {
 	}
 	if resp != nil {
 		logMain.Info("resp.Payload.Result.MessageID:%d", resp.Payload.Result.MessageID)
-		botdb.ChatAddRmMessagePodcasts{
+		// update id message RmListPodkasts for chat
+		chMessId := dbModels.ChatAddRMMessagePodcast{
 			ChatID:  resp.Payload.Result.Chat.ID,
-			RmMsgID: &resp.Payload.Result.MessageID,
-		}.UpdateRmMsgID()
+			RMMSGID: null.NewInt64(resp.Payload.Result.MessageID, true),
+		}
+		//UPSERT
+		chMessId.UpsertGP([]string{
+			dbModels.ChatAddRMMessagePodcastColumns.RMMSGID,
+		},
+			dbModels.ChatAddRMMessagePodcastColumns.ChatID,
+			dbModels.ChatAddRMMessagePodcastColumns.RMMSGID)
 	}
+
 	return nil
 }
 
@@ -116,7 +136,7 @@ func ListAllPodkasts(c *tgbot.Context) error {
 		messagebuffer.WriteString("Listo de podkastoj kia vi abonis:\n")
 
 		for _, ch := range listPodcast {
-			messagebuffer.WriteString(ch.Channel)
+			messagebuffer.WriteString(ch)
 			messagebuffer.WriteString("\n")
 		}
 	} else {
@@ -132,71 +152,3 @@ func AllText(c *tgbot.Context) error {
 	logMain.Info("/.* Chat.ID :%s Message.Text %s ", c.Update.Message.Chat.ID, c.Update.Message.Text)
 	return nil
 }
-
-//
-//	tgApiHelperTypes.AddKeyboardPaginage(keyboard, 0)
-//	//
-//	//keyboard.InlineKeyboard = append(keyboard.InlineKeyboard, []*models.InlineKeyboardButton{
-//	//	&models.InlineKeyboardButton{
-//	//		Text:         "test2",
-//	//		CallbackData: "testData",
-//	//	},
-//	//})
-//
-//	resp, err := Tgapi.Messages.SendMessage(
-//		messages.NewSendMessageParams().WithBody(&models.SendMessageBody{
-//			Text:        pointer.ToString(messagebuffer.String()),
-//			ChatID:      c.Update.Message.Chat.ID,
-//			ReplyMarkup: keyboard,
-//		}),
-//	)
-//	if err != nil {
-//		//return err
-//		logMain.Info(" send msg err %s", err.Error())
-//	}
-//	if resp != nil {
-//		logMain.Info("esp.Payload.Result.MessageID %s", resp.Payload.Result.MessageID)
-//	}
-//	return nil
-//}
-
-//func SubscribeChannel(c *tgbot.Context) error {
-//	logMain.Info("Update.Message.Text  ", c.Update.Message.Text)
-//	txt := strings.TrimSpace(c.Update.Message.Text)
-//	indexToSplit := strings.Index(txt, " ")
-//	if indexToSplit == -1 {
-//		Tgapi.Messages.SendMessage(
-//			messages.NewSendMessageParams().WithBody(&models.SendMessageBody{
-//				Text:   pointer.ToString("you forget to write channel name"),
-//				ChatID: c.Update.Message.Chat.ID,
-//			}),
-//		)
-//		return nil
-//	}
-//
-//	chName := txt[indexToSplit+1:]
-//	q := botdb.PodcastChannelType{ChannelName: chName}.IsExist()
-//	if q {
-//		botdb.ChatPodcasts{
-//			ChatID:  c.Update.Message.Chat.ID,
-//			Channel: chName,
-//		}.Save()
-//		Tgapi.Messages.SendMessage(
-//			messages.NewSendMessageParams().WithBody(&models.SendMessageBody{
-//				Text:             pointer.ToString("done"),
-//				ChatID:           c.Update.Message.Chat.ID,
-//				ReplyToMessageID: c.Update.Message.MessageID,
-//			}),
-//		)
-//		return nil
-//	}
-//
-//	Tgapi.Messages.SendMessage(
-//		messages.NewSendMessageParams().WithBody(&models.SendMessageBody{
-//			Text:             pointer.ToString(chName + " not exist"),
-//			ChatID:           c.Update.Message.Chat.ID,
-//			ReplyToMessageID: c.Update.Message.MessageID,
-//		}),
-//	)
-//	return nil
-//}
