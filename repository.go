@@ -16,6 +16,7 @@ type ChannelRepository interface {
 	FindChannelByName(string) (*Channel, error)
 }
 
+// ChatRepository represent repository for chats
 type ChatRepository interface {
 	RegisterChat(*Chat) error
 	FindChat(id int64) (*Chat, error)
@@ -24,4 +25,5 @@ type ChatRepository interface {
 
 	GetAllChats(count, offset int) []*Chat
 	GetAllChatsSubscribedOn(ch *Channel, count, offset int) []*Chat
+	GetAllChatsIDSubscribedOn(ch *Channel, count, offset int) []int64
 }
