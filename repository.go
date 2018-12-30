@@ -14,7 +14,7 @@ type ChannelRepository interface {
 	RegisterChannel(*Channel) (uuid.UUID, error)
 	FindChannelByID(uuid.UUID) (*Channel, error)
 	FindChannelByName(string) (*Channel, error)
-	GetChannels(count, offset int) ([]*Channel, error)
+	GetChannels(count, offset int, notIn []*Channel) ([]*Channel, error)
 }
 
 // ChatRepository represent repository for chats
