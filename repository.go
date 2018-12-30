@@ -5,10 +5,18 @@ import "github.com/google/uuid"
 // Repository отвечают за стандартизацию взаимодействия с хранилищем (БД + кэш + файловое хранилище + ...) подсистемы.
 // Все IO операции с объектами должны проходить исключително через данный интерфейс
 type Repository interface {
-	RegisterChannel(*Channel) (uuid.UUID, error)
-	GetChannelByID(uuid.UUID) *Channel
-	GetChannelByName(string) *Channel
+	ChannelRepository
+	ChatRepository
+}
 
+// ChannelRepository represent repository for channels
+type ChannelRepository interface {
+	RegisterChannel(*Channel) (uuid.UUID, error)
+	FindChannelByID(uuid.UUID) (*Channel, error)
+	FindChannelByName(string) (*Channel, error)
+}
+
+type ChatRepository interface {
 	RegisterChat(*Chat) error
 	FindChat(id int64) (*Chat, error)
 	SubscribeChat(*Chat, *Channel) error
