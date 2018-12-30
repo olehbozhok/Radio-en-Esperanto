@@ -17,5 +17,5 @@ type Chat struct {
 	telebot.Chat
 	ID int64 `json:"id" bson:"_id"`
 
-	SubscribedChannels []Channel
+	SubscribedChannels []*Channel
 }
