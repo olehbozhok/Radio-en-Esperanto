@@ -29,3 +29,8 @@ func (ch *mongoChannelRepository) FindChannelByID(uuid.UUID) (*radiobot.Channel,
 func (ch *mongoChannelRepository) FindChannelByName(string) (*radiobot.Channel, error) {
 	panic("implement me")
 }
+
+// GetChannels is used get channels
+func (ch *mongoChannelRepository) GetChannels(count, offset int) ([]*radiobot.Channel, error) {
+	panic("implement me")
+}
