@@ -37,8 +37,11 @@ func (ch *mongoChannelRepository) FindChannelByID(id uuid.UUID) (*radiobot.Chann
 }
 
 // FindChannelByName is used to find channel by name
-func (ch *mongoChannelRepository) FindChannelByName(string) (*radiobot.Channel, error) {
-	panic("implement me")
+func (ch *mongoChannelRepository) FindChannelByName(name string) (*radiobot.Channel, error) {
+	radioCh := new(radiobot.Channel)
+	query := ch.Collection.Find(bson.M{"name": name})
+	err := query.One(radioCh)
+	return radioCh, err
 }
 
 // GetChannels is used get channels
