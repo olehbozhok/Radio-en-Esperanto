@@ -11,13 +11,13 @@ import (
 
 // Podcast represent podcast of the channel
 type Podcast struct {
-	ID [md5.Size]byte
+	ID [md5.Size]byte `json:"id" bson:"_id"`
 
-	FileURL   string
-	ChannelID uuid.UUID
-	Comment   string
-	CreatedOn time.Time
-	ParsedOn  time.Time
+	FileURL   string    `json:"file_url" bson:"file_url"`
+	ChannelID uuid.UUID `json:"channel_id" bson:"channel_id"`
+	Comment   string    `json:"comment" bson:"comment"`
+	CreatedOn time.Time `json:"created_on" bson:"created_on"`
+	ParsedOn  time.Time `json:"parsed_on" bson:"parsed_on"`
 }
 
 // CalcID calc and set ID of podcast based on the FileURL
