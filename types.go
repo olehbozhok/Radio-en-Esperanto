@@ -1,11 +1,34 @@
 package radiobot
 
 import (
+	"crypto/md5"
 	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
+
+// Podcast represent podcast of the channel
+type Podcast struct {
+	ID [md5.Size]byte
+
+	FileURL   string
+	ChannelID uuid.UUID
+	Comment   string
+	CreatedOn time.Time
+	ParsedOn  time.Time
+}
+
+// CalcID calc and set ID of podcast based on the FileURL
+func (p *Podcast) CalcID() {
+	p.ID = md5.Sum([]byte(p.FileURL))
+}
+
+// SetParsedOnNow set field ParsedOn now
+func (p *Podcast) SetParsedOnNow() {
+	p.ParsedOn = time.Now()
+}
 
 // Channel represent radio channel
 type Channel struct {
