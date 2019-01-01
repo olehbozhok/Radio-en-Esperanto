@@ -20,6 +20,11 @@ func (rchat *mongoChatRepository) RegisterChat(chat *radiobot.Chat) error {
 	return rchat.Collection.Insert(chat)
 }
 
+// UpdateChat is used for register chats
+func (rchat *mongoChatRepository) UpdateChat(chat *radiobot.Chat) error {
+	return rchat.Collection.UpdateId(chat.ID, chat)
+}
+
 // FindChat is used to find chat by id
 func (rchat *mongoChatRepository) FindChat(id int64) (*radiobot.Chat, error) {
 	chat := new(radiobot.Chat)
