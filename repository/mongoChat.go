@@ -3,6 +3,7 @@ package repository
 import (
 	radiobot "github.com/Oleg-MBO/Radio-en-Esperanto"
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 type mongoChatRepository struct {
@@ -21,7 +22,10 @@ func (rchat *mongoChatRepository) RegisterChat(chat *radiobot.Chat) error {
 
 // FindChat is used to find chat by id
 func (rchat *mongoChatRepository) FindChat(id int64) (*radiobot.Chat, error) {
-	panic("implement me")
+	chat := new(radiobot.Chat)
+	query := rchat.Collection.Find(bson.M{"_id": id})
+	err := query.One(chat)
+	return chat, err
 }
 
 // SubscribeChat is used to subscribe chat on channel
