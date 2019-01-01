@@ -28,7 +28,7 @@ type Chat struct {
 	LastName  string `json:"last_name" bson:"last_name"`
 	Username  string `json:"username" bson:"username"`
 
-	SubscribedChannels []*Channel
+	SubscribedChannelsID []uuid.UUID
 }
 
 // Recipient returns chat ID (see Recipient interface).

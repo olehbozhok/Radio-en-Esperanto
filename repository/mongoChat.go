@@ -35,7 +35,17 @@ func (rchat *mongoChatRepository) FindChat(id int64) (*radiobot.Chat, error) {
 
 // SubscribeChat is used to subscribe chat on channel
 func (rchat *mongoChatRepository) SubscribeChat(chat *radiobot.Chat, channel *radiobot.Channel) error {
-	panic("implement me")
+	chat, err := rchat.FindChat(chat.ID)
+	if err != nil {
+		return err
+	}
+	for _, ch := range chat.SubscribedChannelsID {
+		if ch == channel.ID {
+			return ErrChatAlreadySubskribed
+		}
+	}
+	chat.SubscribedChannelsID = append(chat.SubscribedChannelsID, channel.ID)
+	return rchat.UpdateChat(chat)
 }
 
 // UnsubscribeChat is used to unsubscribe chat on channel
