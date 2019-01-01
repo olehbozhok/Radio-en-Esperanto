@@ -10,8 +10,8 @@ import (
 // Channel represent radio channel
 type Channel struct {
 	ID      uuid.UUID `json:"id" bson:"_id"`
-	Name    string
-	Comment string
+	Name    string    `json:"name" bson:"name"`
+	Comment string    `json:"comment" bson:"comment"`
 }
 
 // Chat telegram info
@@ -19,14 +19,14 @@ type Chat struct {
 	ID int64 `json:"id" bson:"_id"`
 
 	// See telebot.ChatType and consts.
-	Type telebot.ChatType `json:"type"`
+	Type telebot.ChatType `json:"type" bson:"type"`
 
 	// Won't be there for ChatPrivate.
-	Title string `json:"title"`
+	Title string `json:"title" bson:"title"`
 
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Username  string `json:"username"`
+	FirstName string `json:"first_name" bson:"first_name"`
+	LastName  string `json:"last_name" bson:"last_name"`
+	Username  string `json:"username" bson:"username"`
 
 	SubscribedChannels []*Channel
 }
