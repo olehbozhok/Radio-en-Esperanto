@@ -3,6 +3,7 @@ package repository
 import (
 	radiobot "github.com/Oleg-MBO/Radio-en-Esperanto"
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 	"github.com/google/uuid"
 )
 
@@ -28,8 +29,11 @@ func (ch *mongoChannelRepository) RegisterChannel(radioCh *radiobot.Channel) (uu
 }
 
 // FindChannelByID is used to find channel by id
-func (ch *mongoChannelRepository) FindChannelByID(uuid.UUID) (*radiobot.Channel, error) {
-	panic("implement me")
+func (ch *mongoChannelRepository) FindChannelByID(id uuid.UUID) (*radiobot.Channel, error) {
+	radioCh := new(radiobot.Channel)
+	query := ch.Collection.Find(bson.M{"_id": id})
+	err := query.One(radioCh)
+	return radioCh, err
 }
 
 // FindChannelByName is used to find channel by name
