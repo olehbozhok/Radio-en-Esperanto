@@ -16,8 +16,15 @@ func NewMongoChannelRepository(collection *mgo.Collection) radiobot.ChannelRepos
 }
 
 // RegisterChannel is used to register channel
-func (ch *mongoChannelRepository) RegisterChannel(*radiobot.Channel) (uuid.UUID, error) {
-	panic("implement me")
+func (ch *mongoChannelRepository) RegisterChannel(radioCh *radiobot.Channel) (uuid.UUID, error) {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	radioCh.ID = id
+
+	err = ch.Collection.Insert(radioCh)
+	return id, err
 }
 
 // FindChannelByID is used to find channel by id
