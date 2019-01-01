@@ -45,6 +45,6 @@ func (ch *mongoChannelRepository) FindChannelByName(name string) (*radiobot.Chan
 }
 
 // GetChannels is used get channels
-func (ch *mongoChannelRepository) GetChannels(count, offset int, notIn []*radiobot.Channel) ([]*radiobot.Channel, error) {
+func (ch *mongoChannelRepository) GetChannels(count, offset int) ([]*radiobot.Channel, error) {
 	panic("implement me")
 }
