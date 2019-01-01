@@ -49,8 +49,17 @@ func (rchat *mongoChatRepository) SubscribeChat(chat *radiobot.Chat, channel *ra
 }
 
 // UnsubscribeChat is used to unsubscribe chat on channel
-func (rchat *mongoChatRepository) UnsubscribeChat(*radiobot.Chat, *radiobot.Channel) error {
-	panic("implement me")
+func (rchat *mongoChatRepository) UnsubscribeChat(chat *radiobot.Chat, channel *radiobot.Channel) error {
+	chat, err := rchat.FindChat(chat.ID)
+	if err != nil {
+		return err
+	}
+	for i, ch := range chat.SubscribedChannelsID {
+		if ch == channel.ID {
+			chat.SubscribedChannelsID = append(chat.SubscribedChannelsID[:i], chat.SubscribedChannelsID[i+1:]...)
+		}
+	}
+	return rchat.UpdateChat(chat)
 }
 
 // GetAllChats is used to get all chats with count and offset
