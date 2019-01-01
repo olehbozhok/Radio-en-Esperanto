@@ -64,7 +64,9 @@ func (rchat *mongoChatRepository) UnsubscribeChat(chat *radiobot.Chat, channel *
 
 // GetAllChats is used to get all chats with count and offset
 func (rchat *mongoChatRepository) GetAllChats(count, offset int) ([]*radiobot.Chat, error) {
-	panic("implement me")
+	chats := make([]*radiobot.Chat, count)
+	err := rchat.Collection.Find(bson.M{}).Skip(offset).Limit(count).All(chats)
+	return chats, err
 }
 
 // GetAllChatsSubscribedOn is used to fetch all chats which subscribed on channel
