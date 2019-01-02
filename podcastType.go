@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"time"
 
+	telebot "gopkg.in/tucnak/telebot.v2"
+
 	"github.com/google/uuid"
 )
 
@@ -36,6 +38,11 @@ func (p *Podcast) SetParsedOnNow() {
 // IsSended check if podcas is sended to channel
 func (p *Podcast) IsSended() bool {
 	return p.Recipient.Recipient() != "" && (p.CommentMsgID != int64(0) || p.FileMsgID != int64(0))
+}
+
+// SetRecipient set Recipient from telebot.Recipient interface
+func (p *Podcast) SetRecipient(r telebot.Recipient) {
+	p.Recipient = Recipient(r.Recipient())
 }
 
 // Recipient implement telebot.Recipient interface
