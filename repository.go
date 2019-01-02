@@ -5,8 +5,20 @@ import "github.com/google/uuid"
 // Repository отвечают за стандартизацию взаимодействия с хранилищем (БД + кэш + файловое хранилище + ...) подсистемы.
 // Все IO операции с объектами должны проходить исключително через данный интерфейс
 type Repository interface {
+	PodcastRepository
 	ChannelRepository
 	ChatRepository
+}
+
+// PodcastRepository represent repository for podcasts
+type PodcastRepository interface {
+	AddPocast(Podcast) error
+	IsNewPodcast(Podcast) (bool, error)
+	GetUnSendedPodcasts(count, offset int) ([]Podcast, error)
+
+	// TODO: implement in future
+	// FindAllPocastParsedFromTo(from, to time.Time, count, offset int) ([]Podcast, error)
+	// FindPocastParsedFromToByChannelID(from, to time.Time, count, offset int, channelID uuid.UUID) ([]Podcast, error)
 }
 
 // ChannelRepository represent repository for channels
