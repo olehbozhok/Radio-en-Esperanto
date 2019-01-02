@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"crypto/md5"
 	"fmt"
 	"time"
 
@@ -59,4 +60,20 @@ func (rpod *mongoPodcastRepository) FindUnsendedPodcasts(count, offset int) ([]r
 	podcastList := make([]radiobot.Podcast, 0, count)
 	err := rpod.Collection.Find(bson.M{"recipient": ""}).Skip(offset).Limit(count).All(&podcastList)
 	return podcastList, err
+}
+
+// UpdatePodcast update podcast in db
+func (rpod *mongoPodcastRepository) UpdatePodcast(p radiobot.Podcast) error {
+	p.CalcID()
+	if p.ChannelID == (uuid.UUID{}) {
+		return fmt.Errorf("channel id can`t be empty")
+	}
+	if p.ParsedOn == (time.Time{}) || p.CreatedOn == (time.Time{}) {
+		return fmt.Errorf("time values must be not empty")
+	}
+	if !p.IsSended() {
+		return fmt.Errorf("podcast must be sended")
+	}
+
+	return rpod.Collection.UpdateId(p.ID, p)
 }

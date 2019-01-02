@@ -18,6 +18,7 @@ type PodcastRepository interface {
 	IsNewPodcast(Podcast) (bool, error)
 	FindPodcastByID(*Podcast) error
 	FindUnsendedPodcasts(count, offset int) ([]Podcast, error)
+	UpdatePodcast(Podcast) error
 
 	// TODO: implement in future
 	// FindAllPocastParsedFromTo(from, to time.Time, count, offset int) ([]Podcast, error)
