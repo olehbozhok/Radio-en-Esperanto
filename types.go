@@ -12,7 +12,13 @@ type Channel struct {
 	ID      uuid.UUID `json:"id" bson:"_id"`
 	Name    string    `json:"name" bson:"name"`
 	Comment string    `json:"comment" bson:"comment"`
-	Parser string `json:"comment" bson:"comment"`
+	Parser  string    `json:"comment" bson:"comment"`
+}
+
+// PodcastAndChannel is used for parsing result
+type PodcastAndChannel struct {
+	Podcast *Podcast
+	Channel *Channel
 }
 
 // Chat telegram info
