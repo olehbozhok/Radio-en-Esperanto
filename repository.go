@@ -41,4 +41,7 @@ type ChatRepository interface {
 	GetAllChats(count, offset int) ([]*Chat, error)
 	// GetAllChatsSubscribedOn(ch *Channel, count, offset int) ([]*Chat, error)
 	GetAllChatsIDSubscribedOn(ch *Channel, count, offset int) ([]int64, error)
+
+	// TODO
+	// SetChatLastSendNow() error
 }
