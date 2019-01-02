@@ -16,7 +16,7 @@ type Repository interface {
 type PodcastRepository interface {
 	AddPocast(Podcast) error
 	IsNewPodcast(Podcast) (bool, error)
-	GetUnSendedPodcasts(count, offset int) ([]Podcast, error)
+	GetUnsendedPodcasts(count, offset int) ([]Podcast, error)
 
 	// TODO: implement in future
 	// FindAllPocastParsedFromTo(from, to time.Time, count, offset int) ([]Podcast, error)
