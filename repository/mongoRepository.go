@@ -6,14 +6,16 @@ import (
 )
 
 type mongoRepository struct {
-	mongoChatRepository
+	mongoPodcastRepository
 	mongoChannelRepository
+	mongoChatRepository
 }
 
 // NewMongoRepository mongo repository
-func NewMongoRepository(chatCollection, channelCollection *mgo.Collection) radiobot.Repository {
+func NewMongoRepository(podcastCollection, channelCollection, chatCollection *mgo.Collection) radiobot.Repository {
 	return &mongoRepository{
 		mongoChannelRepository: mongoChannelRepository{channelCollection},
 		mongoChatRepository:    mongoChatRepository{chatCollection},
+		mongoPodcastRepository: mongoPodcastRepository{podcastCollection},
 	}
 }
