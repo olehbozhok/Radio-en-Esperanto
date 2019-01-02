@@ -16,7 +16,7 @@ type Repository interface {
 type PodcastRepository interface {
 	AddPocast(Podcast) error
 	IsNewPodcast(Podcast) (bool, error)
-	FindPodcastByID(*Podcast) error
+	// FindPodcastByID(*Podcast) error
 	FindUnsendedPodcasts(count, offset int) ([]Podcast, error)
 	UpdatePodcast(Podcast) error
 
