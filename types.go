@@ -23,7 +23,8 @@ type PodcastAndChannel struct {
 
 // Chat telegram info
 type Chat struct {
-	ID int64 `json:"id" bson:"_id"`
+	ID     string `json:"id" bson:"_id"`
+	chatID int64  `json:"chat_id" bson:"chat_id"`
 
 	// See telebot.ChatType and consts.
 	Type telebot.ChatType `json:"type" bson:"type"`
@@ -43,14 +44,15 @@ func (c *Chat) Recipient() string {
 	if c.Type == telebot.ChatChannel {
 		return "@" + c.Username
 	}
-	return strconv.FormatInt(c.ID, 10)
+	return strconv.FormatInt(c.chatID, 10)
 }
 
 // FromTgChat fill fields from tg.Chat
 func (c *Chat) FromTgChat(ch telebot.Chat) {
-	c.ID = ch.ID
+	c.chatID = ch.ID
 	c.Type = ch.Type
 	c.Title = ch.Title
 	c.FirstName = ch.FirstName
 	c.Username = ch.Username
+	c.ID = c.Recipient()
 }
