@@ -45,3 +45,12 @@ func (c *Chat) Recipient() string {
 	}
 	return strconv.FormatInt(c.ID, 10)
 }
+
+// FromTgChat fill fields from tg.Chat
+func (c *Chat) FromTgChat(ch telebot.Chat) {
+	c.ID = ch.ID
+	c.Type = ch.Type
+	c.Title = ch.Title
+	c.FirstName = ch.FirstName
+	c.Username = ch.Username
+}
