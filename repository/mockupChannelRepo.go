@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	radiobot "github.com/Oleg-MBO/Radio-en-Esperanto"
-	"github.com/google/uuid"
 )
 
 type mockupChannelRepository struct {
@@ -24,7 +23,6 @@ func NewMockupChannelRepository() radiobot.ChannelRepository {
 func (ch *mockupChannelRepository) RegisterChannel(radioCh *radiobot.Channel) error {
 	ch.m.Lock()
 	defer ch.m.Unlock()
-	id, err := uuid.NewRandom()
 
 	radioCh.CalcID()
 
