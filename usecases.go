@@ -26,7 +26,8 @@ type Usecase interface {
 	// send message to one user
 	Send(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error)
 
-	SendPodcastToSubscribers(Podcast) error
+	// TODO: Implement in future
+	// SendPodcastToSubscribers(Podcast) error
 
 	FindOrRegisterChat(*Chat) error
 	SubscribeChat(*Chat, *Channel) error
