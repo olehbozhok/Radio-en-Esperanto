@@ -12,7 +12,7 @@ type Channel struct {
 	ID      uuid.UUID `json:"id" bson:"_id"`
 	Name    string    `json:"name" bson:"name"`
 	Comment string    `json:"comment" bson:"comment"`
-	Parser  string    `json:"comment" bson:"comment"`
+	Parser  string    `json:"parser" bson:"parser"`
 }
 
 // PodcastAndChannel is used for parsing result
