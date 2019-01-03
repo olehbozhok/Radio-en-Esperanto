@@ -14,7 +14,7 @@ type Usecase interface {
 	FindChannelByName(string) (*Channel, error)
 
 	// Зберегти новий канал
-	RegisterORFindChannel(*Channel) (uuid.UUID, error)
+	RegisterORFindChannel(*Channel) error
 
 	// save podcast (not sended to tg channel)
 	SaveOnlyNewPodcast(Podcast) (bool, error)

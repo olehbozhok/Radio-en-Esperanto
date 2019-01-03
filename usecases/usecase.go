@@ -35,16 +35,16 @@ func (u *usecases) FindChannelByName(name string) (*radiobot.Channel, error) {
 	return u.repo.FindChannelByName(name)
 }
 
-func (u *usecases) RegisterORFindChannel(ch *radiobot.Channel) (uuid.UUID, error) {
+func (u *usecases) RegisterORFindChannel(ch *radiobot.Channel) error {
 	chOld, err := u.repo.FindChannelByName(ch.Name)
 	if err != nil && err != mgo.ErrNotFound {
-		return uuid.UUID{}, err
+		return err
 	}
 	if err == mgo.ErrNotFound {
 		u.repo.RegisterChannel(ch)
 	}
 	ch = chOld
-	return ch.ID, err
+	return err
 }
 
 // SaveOnlyNewPodcast save podcast (not sended to tg channel)
