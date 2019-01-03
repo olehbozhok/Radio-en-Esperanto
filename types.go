@@ -1,6 +1,7 @@
 package radiobot
 
 import (
+	"crypto/md5"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -9,10 +10,15 @@ import (
 
 // Channel represent radio channel
 type Channel struct {
-	ID      uuid.UUID `json:"id" bson:"_id"`
-	Name    string    `json:"name" bson:"name"`
-	Comment string    `json:"comment" bson:"comment"`
-	Parser  string    `json:"parser" bson:"parser"`
+	ID      [md5.Size]byte `json:"id" bson:"_id"`
+	Name    string         `json:"name" bson:"name"`
+	Comment string         `json:"comment" bson:"comment"`
+	Parser  string         `json:"parser" bson:"parser"`
+}
+
+// CalcID calc and set ID of podcast based on the FileURL
+func (c *Channel) CalcID() {
+	c.ID = md5.Sum([]byte(c.Parser + "-" + c.Name))
 }
 
 // PodcastAndChannel is used for parsing result
