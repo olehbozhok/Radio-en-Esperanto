@@ -1,8 +1,6 @@
 package radiobot
 
-import (
-	"github.com/google/uuid"
-)
+import "crypto/md5"
 
 // Repository отвечают за стандартизацию взаимодействия с хранилищем (БД + кэш + файловое хранилище + ...) подсистемы.
 // Все IO операции с объектами должны проходить исключително через данный интерфейс
@@ -27,8 +25,8 @@ type PodcastRepository interface {
 
 // ChannelRepository represent repository for channels
 type ChannelRepository interface {
-	RegisterChannel(*Channel) (uuid.UUID, error)
-	FindChannelByID(uuid.UUID) (*Channel, error)
+	RegisterChannel(*Channel) error
+	FindChannelByID([md5.Size]byte) (*Channel, error)
 	FindChannelByName(string) (*Channel, error)
 	GetChannels(count, offset int) ([]*Channel, error)
 }
@@ -42,7 +40,7 @@ type ChatRepository interface {
 
 	GetAllChats(count, offset int) ([]*Chat, error)
 	// GetAllChatsSubscribedOn(ch *Channel, count, offset int) ([]*Chat, error)
-	GetAllChatsIDSubscribedOn(ch *Channel, count, offset int) ([]int64, error)
+	GetAllChatsIDSubscribedOn(ch *Channel, count, offset int) ([]string, error)
 
 	// TODO
 	// SetChatLastSendNow() error
