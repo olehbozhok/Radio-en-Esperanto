@@ -34,7 +34,7 @@ type ChannelRepository interface {
 // ChatRepository represent repository for chats
 type ChatRepository interface {
 	RegisterChat(*Chat) error
-	FindChat(id int64) (*Chat, error)
+	FindChat(id string) (*Chat, error)
 	SubscribeChat(*Chat, *Channel) error
 	UnsubscribeChat(*Chat, *Channel) error
 
