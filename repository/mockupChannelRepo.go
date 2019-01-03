@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"crypto/md5"
 	"fmt"
 	"sync"
 
@@ -20,21 +21,19 @@ func NewMockupChannelRepository() radiobot.ChannelRepository {
 }
 
 // RegisterChannel is used to register channel
-func (ch *mockupChannelRepository) RegisterChannel(radioCh *radiobot.Channel) (uuid.UUID, error) {
+func (ch *mockupChannelRepository) RegisterChannel(radioCh *radiobot.Channel) error {
 	ch.m.Lock()
 	defer ch.m.Unlock()
 	id, err := uuid.NewRandom()
-	if err != nil {
-		return uuid.UUID{}, err
-	}
-	radioCh.ID = id
+
+	radioCh.CalcID()
 
 	ch.cache = append(ch.cache, radioCh)
-	return id, err
+	return nil
 }
 
 // FindChannelByID is used to find channel by id
-func (ch *mockupChannelRepository) FindChannelByID(id uuid.UUID) (*radiobot.Channel, error) {
+func (ch *mockupChannelRepository) FindChannelByID(id [md5.Size]byte) (*radiobot.Channel, error) {
 	ch.m.Lock()
 	defer ch.m.Unlock()
 	for _, radioCh := range ch.cache {

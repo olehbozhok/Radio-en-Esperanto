@@ -1,10 +1,11 @@
 package repository
 
 import (
+	"crypto/md5"
+
 	radiobot "github.com/Oleg-MBO/Radio-en-Esperanto"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
-	"github.com/google/uuid"
 )
 
 type mongoChannelRepository struct {
@@ -17,19 +18,13 @@ func NewMongoChannelRepository(collection *mgo.Collection) radiobot.ChannelRepos
 }
 
 // RegisterChannel is used to register channel
-func (ch *mongoChannelRepository) RegisterChannel(radioCh *radiobot.Channel) (uuid.UUID, error) {
-	id, err := uuid.NewRandom()
-	if err != nil {
-		return uuid.UUID{}, err
-	}
-	radioCh.ID = id
-
-	err = ch.Collection.Insert(radioCh)
-	return id, err
+func (ch *mongoChannelRepository) RegisterChannel(radioCh *radiobot.Channel) error {
+	radioCh.CalcID()
+	return ch.Collection.Insert(radioCh)
 }
 
 // FindChannelByID is used to find channel by id
-func (ch *mongoChannelRepository) FindChannelByID(id uuid.UUID) (*radiobot.Channel, error) {
+func (ch *mongoChannelRepository) FindChannelByID(id [md5.Size]byte) (*radiobot.Channel, error) {
 	radioCh := new(radiobot.Channel)
 	query := ch.Collection.Find(bson.M{"_id": id})
 	err := query.One(radioCh)
