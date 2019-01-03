@@ -23,6 +23,7 @@ type Podcast struct {
 	Recipient    Recipient `json:"recipient" bson:"recipient"`
 	CommentMsgID int       `json:"comment_msg_id" bson:"comment_msg_id"`
 	FileMsgID    int       `json:"file_msg_id" bson:"file_msg_id"`
+	FIleTgID     string    `json:"file_tg_id" bson:"file_tg_id"`
 }
 
 // CalcID calc and set ID of podcast based on the FileURL
