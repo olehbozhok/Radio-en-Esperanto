@@ -26,7 +26,7 @@ func (rchat *mongoChatRepository) UpdateChat(chat *radiobot.Chat) error {
 }
 
 // FindChat is used to find chat by id
-func (rchat *mongoChatRepository) FindChat(id int64) (*radiobot.Chat, error) {
+func (rchat *mongoChatRepository) FindChat(id string) (*radiobot.Chat, error) {
 	chat := new(radiobot.Chat)
 	query := rchat.Collection.Find(bson.M{"_id": id})
 	err := query.One(chat)
@@ -77,14 +77,14 @@ func (rchat *mongoChatRepository) GetAllChatsSubscribedOn(ch *radiobot.Channel, 
 }
 
 // GetAllChatsIDSubscribedOn is used to fetch all chats ID which subscribed on channel
-func (rchat *mongoChatRepository) GetAllChatsIDSubscribedOn(ch *radiobot.Channel, count, offset int) ([]int64, error) {
+func (rchat *mongoChatRepository) GetAllChatsIDSubscribedOn(ch *radiobot.Channel, count, offset int) ([]string, error) {
 	// unefficient way
 	// TODO: make more efficient
 	chats, err := rchat.GetAllChatsSubscribedOn(ch, count, offset)
 	if err != nil {
 		return nil, err
 	}
-	idArr := make([]int64, 0, len(chats))
+	idArr := make([]string, 0, len(chats))
 	for _, chat := range chats {
 		idArr = append(idArr, chat.ID)
 	}
