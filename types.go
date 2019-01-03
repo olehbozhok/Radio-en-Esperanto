@@ -53,6 +53,11 @@ func (c *Chat) Recipient() string {
 	return strconv.FormatInt(c.chatID, 10)
 }
 
+// SetID calc and set ID from Recipient
+func (c *Chat) SetID() {
+	c.ID = c.Recipient()
+}
+
 // FromTgChat fill fields from tg.Chat
 func (c *Chat) FromTgChat(ch telebot.Chat) {
 	c.chatID = ch.ID
