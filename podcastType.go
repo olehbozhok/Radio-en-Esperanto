@@ -21,8 +21,8 @@ type Podcast struct {
 
 	// telegram messages data to forward messages from channel to another chat
 	Recipient    Recipient `json:"recipient" bson:"recipient"`
-	CommentMsgID int64     `json:"comment_msg_id" bson:"comment_msg_id"`
-	FileMsgID    int64     `json:"file_msg_id" bson:"file_msg_id"`
+	CommentMsgID int       `json:"comment_msg_id" bson:"comment_msg_id"`
+	FileMsgID    int       `json:"file_msg_id" bson:"file_msg_id"`
 }
 
 // CalcID calc and set ID of podcast based on the FileURL
@@ -37,7 +37,7 @@ func (p *Podcast) SetParsedOnNow() {
 
 // IsSended check if podcas is sended to channel
 func (p *Podcast) IsSended() bool {
-	return p.Recipient.Recipient() != "" && (p.CommentMsgID != int64(0) || p.FileMsgID != int64(0))
+	return p.Recipient.Recipient() != "" && (p.CommentMsgID != 0 || p.FileMsgID != 0)
 }
 
 // SetRecipient set Recipient from telebot.Recipient interface
