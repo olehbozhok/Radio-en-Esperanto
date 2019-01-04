@@ -139,9 +139,10 @@ func (u *usecases) SendAndUpdatePodcast(p *radiobot.Podcast) error {
 
 		if isMP3 {
 			fileSentable = &telebot.Audio{
-				File:    telebot.FromReader(body),
-				Caption: "#" + title,
-				Title:   title + ".mp3",
+				File:      telebot.FromReader(body),
+				Caption:   "#" + title,
+				Title:     title + ".mp3",
+				Performer: podcastChannel.Name,
 			}
 		} else {
 			fileSentable = &telebot.Document{
