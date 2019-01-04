@@ -16,6 +16,8 @@ type Usecase interface {
 	// Зберегти новий канал
 	RegisterORFindChannel(*Channel) error
 
+	GetChannels(count, offset int) ([]*Channel, error)
+
 	// save podcast and channel that return parser (not sended to tg channel yet)
 	SaveOnlyNewPodcastAndChannel(PodcastAndChannel) (isPodcastNew bool, err error)
 

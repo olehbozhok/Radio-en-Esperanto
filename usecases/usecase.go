@@ -55,6 +55,11 @@ func (u *usecases) RegisterORFindChannel(ch *radiobot.Channel) error {
 	return err
 }
 
+// GetChannels is used get channels
+func (u *usecases) GetChannels(count, offset int) ([]*radiobot.Channel, error) {
+	return u.repo.GetChannels(count, offset)
+}
+
 // SaveOnlyNewPodcast save podcast (not sended to tg channel)
 // return true if podcast is new
 func (u *usecases) SaveOnlyNewPodcast(p radiobot.Podcast) (bool, error) {
