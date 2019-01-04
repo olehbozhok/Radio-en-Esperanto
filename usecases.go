@@ -38,4 +38,6 @@ type Usecase interface {
 
 	// // add Recipient interface
 	// SendMessageTo(*Chat, interface{})
+
+	HandleTg(endpoint interface{}, handler interface{})
 }
