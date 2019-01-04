@@ -239,6 +239,11 @@ func (u *usecases) GetAllChats(count, offset int) ([]*radiobot.Chat, error) {
 	return u.repo.GetAllChats(count, offset)
 }
 
+// GetAllChatsIDSubscribedOn is used to fetch all chats ID which subscribed on channel
+func (u *usecases) GetAllChatsIDSubscribedOn(ch *radiobot.Channel, count, offset int) ([]string, error) {
+	return u.repo.GetAllChatsIDSubscribedOn(ch, count, offset)
+}
+
 // HandleTg to handle telegram handlers
 func (u *usecases) HandleTg(endpoint interface{}, handler interface{}) {
 	u.tgBot.Handle(endpoint, handler)

@@ -34,7 +34,7 @@ type Usecase interface {
 	UnsubscribeChat(*Chat, *Channel) error
 
 	GetAllChats(count, offset int) ([]*Chat, error)
-	// GetAllChatsSubscribedOn(ch *Channel, count, offset int) []*Chat
+	GetAllChatsIDSubscribedOn(ch *Channel, count, offset int) ([]string, error)
 
 	// // add Recipient interface
 	// SendMessageTo(*Chat, interface{})
