@@ -109,7 +109,6 @@ func (u *usecases) SendAndUpdatePodcast(p *radiobot.Podcast) error {
 		buffer.WriteString(markdownFile)
 
 	}
-	fmt.Println(p.Comment)
 
 	descriptionMsg, err := u.tgBot.Send(u.tgChannel, buffer.String(), &telebot.SendOptions{
 		DisableWebPagePreview: false,
