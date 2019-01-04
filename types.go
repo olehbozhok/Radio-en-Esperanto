@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"strconv"
 
-	"github.com/google/uuid"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -42,7 +41,7 @@ type Chat struct {
 	LastName  string `json:"last_name" bson:"last_name"`
 	Username  string `json:"username" bson:"username"`
 
-	SubscribedChannelsID []uuid.UUID `json:"subscribed_channels_id" bson:"subscribed_channels_id"`
+	SubscribedChannelsID [][md5.Size]byte `json:"subscribed_channels_id" bson:"subscribed_channels_id"`
 }
 
 // Recipient returns chat ID (see Recipient interface).
