@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html"
+	"io"
 	"net/http"
 	"strings"
 
@@ -15,7 +16,8 @@ import (
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
-const maxFileLengthTg = 20000
+// 50 MB
+const maxAudioLengthTg = 50000000
 
 type usecases struct {
 	repo  radiobot.Repository
@@ -72,14 +74,22 @@ func (u *usecases) FindUnsendedPodcasts(count, offset int) ([]radiobot.Podcast, 
 	return u.repo.FindUnsendedPodcasts(count, offset)
 }
 
-func checkDataPodcastHEAD(url string) (isMP3 bool, contentlength int64, err error) {
+func getDataPodcast(url string) (isMP3 bool, contentlength int64, body io.ReadCloser, err error) {
 	var res *http.Response
-	res, err = http.Head(url)
+	res, err = http.Get(url)
 	if err != nil {
 		return
 	}
 	contentlength = res.ContentLength
 	isMP3 = strings.Contains(res.Header.Get("Content-Type"), "mpeg")
+	if err == nil {
+		if res.StatusCode != 200 {
+			res.Body.Close()
+			err = fmt.Errorf("Status code not 200")
+			return
+		}
+		body = res.Body
+	}
 	return
 }
 
@@ -91,27 +101,25 @@ func (u *usecases) SendAndUpdatePodcast(p *radiobot.Podcast) error {
 	if err != nil {
 		return errors.Wrap(err, "error find channel id")
 	}
-	// TODO Replace p.ParsedOn.String() to better print
-	// markdownFile := fmt.Sprintf(`[Dosiero](%s)`, p.FileURL)
-	markdownFile := fmt.Sprintf(`<a href="%s">Dosiero</a>`, p.FileURL)
+
+	// Send comment to podcast
+	title := strings.Replace(strings.Replace(podcastChannel.Name, " ", "_", -1), ".", "_", -1) + " " + p.CreatedOn.Format("2006-01-02")
+	htmlURLFile := fmt.Sprintf(`<a href="%s">Dosiero</a>`, p.FileURL)
 	buffer := bytes.Buffer{}
 	buffer.WriteString("#")
-	buffer.WriteString(strings.Replace(strings.Replace(podcastChannel.Name, " ", "_", -1), ".", "_", -1))
-	buffer.WriteString(" ")
-	buffer.WriteString(p.CreatedOn.Format("2006-01-02"))
+	buffer.WriteString(title)
 	buffer.WriteString("\n")
-	buffer.WriteString(markdownFile)
+	buffer.WriteString(htmlURLFile)
 	buffer.WriteString("\n\n")
 	if p.Comment != "" {
 		buffer.WriteString(html.EscapeString(p.Comment))
 		buffer.WriteString("\n\n")
 
-		buffer.WriteString(markdownFile)
-
+		buffer.WriteString(htmlURLFile)
 	}
 
 	descriptionMsg, err := u.tgBot.Send(u.tgChannel, buffer.String(), &telebot.SendOptions{
-		DisableWebPagePreview: false,
+		DisableWebPagePreview: true,
 		ParseMode:             telebot.ModeHTML,
 	})
 	if err != nil {
@@ -119,42 +127,47 @@ func (u *usecases) SendAndUpdatePodcast(p *radiobot.Podcast) error {
 	}
 	p.CommentMsgID = descriptionMsg.ID
 
-	// var fileSentable telebot.Sendable
+	// Send  podcast file
 
-	// if isMP3 {
-	// 	fileSentable = &telebot.Audio{
-	// 		File:    telebot.FromURL(p.FileURL),
-	// 		Caption: "#" + title,
-	// 		// Title:   title + ".mp3",
-	// 	}
-	// } else {
-	// 	fileSentable = &telebot.Document{
-	// 		File:    telebot.FromURL(p.FileURL),
-	// 		Caption: "#" + title,
-	// 		// FileName:   title + ".mp3",
-	// 	}
-	// }
+	isMP3, contLength, body, err := getDataPodcast(p.FileURL)
+	if err == nil {
+		defer body.Close()
+	}
+	if err == nil && contLength <= maxAudioLengthTg {
 
-	// if contentlength <= maxFileLengthTg {
-	// 	message, err := u.tgBot.Send(u.tgChannel, fileSentable, &telebot.SendOptions{
-	// 		DisableNotification: true,
-	// 	})
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	p.SetRecipient(u.tgChannel)
-	// 	p.FileMsgID = message.ID
+		var fileSentable telebot.Sendable
 
-	// 	if message.Audio != nil {
-	// 		p.FIleTgID = message.Audio.FileID
-	// 	} else if message.Document != nil {
-	// 		p.FIleTgID = message.Audio.FileID
-	// 	}
+		if isMP3 {
+			fileSentable = &telebot.Audio{
+				File:    telebot.FromReader(body),
+				Caption: "#" + title,
+				Title:   title + ".mp3",
+			}
+		} else {
+			fileSentable = &telebot.Document{
+				File:     telebot.FromReader(body),
+				Caption:  "#" + title,
+				FileName: title + ".mp3",
+			}
+		}
 
-	// }
-	// TODO: ENABLE UPDATE podcast in db
-	// return u.repo.UpdatePodcast(*p)
-	return nil
+		message, err := u.tgBot.Send(u.tgChannel, fileSentable, &telebot.SendOptions{
+			DisableNotification: true,
+		})
+		if err != nil {
+			return err
+		}
+		p.FileMsgID = message.ID
+
+		if message.Audio != nil {
+			p.FIleTgID = message.Audio.FileID
+		} else if message.Document != nil {
+			p.FIleTgID = message.Document.FileID
+		}
+
+	}
+	p.SetRecipient(u.tgChannel)
+	return u.repo.UpdatePodcast(*p)
 }
 
 // Send message to one user
