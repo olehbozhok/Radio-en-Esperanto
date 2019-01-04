@@ -51,6 +51,8 @@ func NewEsperantoRadio() Parser {
 					err = fmt.Errorf("RegexpDataAndChannel.FindStringSubmatch(strongElem.Text()) != 3")
 					return false
 				}
+				strongElem.Remove()
+				podcast.Comment = strings.TrimSpace(s.Text())
 
 				channel.CalcID()
 				podcast.ChannelID = channel.ID
