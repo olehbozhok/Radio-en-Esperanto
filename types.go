@@ -59,7 +59,7 @@ func (c *Chat) SetID() {
 }
 
 // FromTgChat fill fields from tg.Chat
-func (c *Chat) FromTgChat(ch telebot.Chat) {
+func (c *Chat) FromTgChat(ch *telebot.Chat) {
 	c.chatID = ch.ID
 	c.Type = ch.Type
 	c.Title = ch.Title
