@@ -235,6 +235,10 @@ func (u *usecases) UnsubscribeChat(chat *radiobot.Chat, channel *radiobot.Channe
 	return u.repo.UnsubscribeChat(chat, channel)
 }
 
+func (u *usecases) GetAllChats(count, offset int) ([]*radiobot.Chat, error) {
+	return u.repo.GetAllChats(count, offset)
+}
+
 // HandleTg to handle telegram handlers
 func (u *usecases) HandleTg(endpoint interface{}, handler interface{}) {
 	u.tgBot.Handle(endpoint, handler)
