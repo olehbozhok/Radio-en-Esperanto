@@ -42,9 +42,9 @@ func (rpod *mongoPodcastRepository) IsNewPodcast(p radiobot.Podcast) (bool, erro
 		return false, err
 	}
 	if n > 0 {
-		return true, nil
+		return false, nil
 	}
-	return false, nil
+	return true, nil
 }
 
 // GetUnsendedPodcasts check if podcast exist

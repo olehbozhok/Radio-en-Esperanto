@@ -1,6 +1,10 @@
 package usecases
 
 import (
+	"bytes"
+	"fmt"
+	"html"
+	"net/http"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -10,6 +14,8 @@ import (
 	"github.com/google/uuid"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
+
+const maxFileLengthTg = 20000
 
 type usecases struct {
 	repo  radiobot.Repository
@@ -54,7 +60,9 @@ func (u *usecases) SaveOnlyNewPodcast(p radiobot.Podcast) (bool, error) {
 	if err != nil {
 		return isNew, err
 	}
-	err = u.repo.AddPocast(p)
+	if isNew {
+		err = u.repo.AddPocast(p)
+	}
 	return isNew, err
 }
 
@@ -62,6 +70,17 @@ func (u *usecases) SaveOnlyNewPodcast(p radiobot.Podcast) (bool, error) {
 // return true if podcast is new
 func (u *usecases) FindUnsendedPodcasts(count, offset int) ([]radiobot.Podcast, error) {
 	return u.repo.FindUnsendedPodcasts(count, offset)
+}
+
+func checkDataPodcastHEAD(url string) (isMP3 bool, contentlength int64, err error) {
+	var res *http.Response
+	res, err = http.Head(url)
+	if err != nil {
+		return
+	}
+	contentlength = res.ContentLength
+	isMP3 = strings.Contains(res.Header.Get("Content-Type"), "mpeg")
+	return
 }
 
 // // send podcast to tg channel and update podcast in db
@@ -73,28 +92,67 @@ func (u *usecases) SendAndUpdatePodcast(p *radiobot.Podcast) error {
 		return errors.Wrap(err, "error find channel id")
 	}
 	// TODO Replace p.ParsedOn.String() to better print
-	title := strings.Replace(podcastChannel.Name, " ", "_", -1) + " " + p.ParsedOn.String()
+	// markdownFile := fmt.Sprintf(`[Dosiero](%s)`, p.FileURL)
+	markdownFile := fmt.Sprintf(`<a href="%s">Dosiero</a>`, p.FileURL)
+	buffer := bytes.Buffer{}
+	buffer.WriteString("#")
+	buffer.WriteString(strings.Replace(strings.Replace(podcastChannel.Name, " ", "_", -1), ".", "_", -1))
+	buffer.WriteString(" ")
+	buffer.WriteString(p.CreatedOn.Format("2006-01-02"))
+	buffer.WriteString("\n")
+	buffer.WriteString(markdownFile)
+	buffer.WriteString("\n\n")
+	if p.Comment != "" {
+		buffer.WriteString(html.EscapeString(p.Comment))
+		buffer.WriteString("\n\n")
 
-	descriptionMsg, err := u.tgBot.Send(u.tgChannel, "#"+title+"\n\n"+p.Comment)
+		buffer.WriteString(markdownFile)
+
+	}
+	fmt.Println(p.Comment)
+
+	descriptionMsg, err := u.tgBot.Send(u.tgChannel, buffer.String(), &telebot.SendOptions{
+		DisableWebPagePreview: false,
+		ParseMode:             telebot.ModeHTML,
+	})
 	if err != nil {
 		return err
 	}
 	p.CommentMsgID = descriptionMsg.ID
 
-	tgAudioURL := telebot.Audio{
-		File:    telebot.FromURL(p.FileURL),
-		Caption: "#" + title,
-		Title:   title + ".mp3",
-	}
+	// var fileSentable telebot.Sendable
 
-	message, err := tgAudioURL.Send(u.tgBot, u.tgChannel, nil)
-	if err != nil {
-		return err
-	}
-	p.SetRecipient(u.tgChannel)
-	p.FileMsgID = message.ID
-	p.FIleTgID = message.Audio.FileID
+	// if isMP3 {
+	// 	fileSentable = &telebot.Audio{
+	// 		File:    telebot.FromURL(p.FileURL),
+	// 		Caption: "#" + title,
+	// 		// Title:   title + ".mp3",
+	// 	}
+	// } else {
+	// 	fileSentable = &telebot.Document{
+	// 		File:    telebot.FromURL(p.FileURL),
+	// 		Caption: "#" + title,
+	// 		// FileName:   title + ".mp3",
+	// 	}
+	// }
 
+	// if contentlength <= maxFileLengthTg {
+	// 	message, err := u.tgBot.Send(u.tgChannel, fileSentable, &telebot.SendOptions{
+	// 		DisableNotification: true,
+	// 	})
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	p.SetRecipient(u.tgChannel)
+	// 	p.FileMsgID = message.ID
+
+	// 	if message.Audio != nil {
+	// 		p.FIleTgID = message.Audio.FileID
+	// 	} else if message.Document != nil {
+	// 		p.FIleTgID = message.Audio.FileID
+	// 	}
+
+	// }
 	// TODO: ENABLE UPDATE podcast in db
 	// return u.repo.UpdatePodcast(*p)
 	return nil
