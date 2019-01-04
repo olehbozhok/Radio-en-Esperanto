@@ -16,8 +16,8 @@ type Usecase interface {
 	// Зберегти новий канал
 	RegisterORFindChannel(*Channel) error
 
-	// save podcast (not sended to tg channel)
-	SaveOnlyNewPodcast(Podcast) (bool, error)
+	// save podcast and channel that return parser (not sended to tg channel yet)
+	SaveOnlyNewPodcastAndChannel(PodcastAndChannel) (isPodcastNew bool, err error)
 
 	FindUnsendedPodcasts(count, offset int) ([]Podcast, error)
 	// send podcast to tg channel and update podcast in db

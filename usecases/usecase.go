@@ -74,6 +74,24 @@ func (u *usecases) FindUnsendedPodcasts(count, offset int) ([]radiobot.Podcast, 
 	return u.repo.FindUnsendedPodcasts(count, offset)
 }
 
+// SaveOnlyNewPodcastAndChannel save to db podcast and channel that return parser
+func (u *usecases) SaveOnlyNewPodcastAndChannel(pAndCh radiobot.PodcastAndChannel) (isPodcastNew bool, err error) {
+	p := pAndCh.Podcast
+	if p == nil {
+		return false, fmt.Errorf("podcast must be not nil")
+	}
+	ch := pAndCh.Channel
+	if ch == nil {
+		return false, fmt.Errorf("channel must be not nil")
+	}
+	err = u.RegisterORFindChannel(ch)
+	if err != nil {
+		return false, err
+	}
+	return u.SaveOnlyNewPodcast(*p)
+
+}
+
 func getDataPodcast(url string) (isMP3 bool, contentlength int64, body io.ReadCloser, err error) {
 	var res *http.Response
 	res, err = http.Get(url)
