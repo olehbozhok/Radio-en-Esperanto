@@ -11,6 +11,9 @@ type mongoRepository struct {
 	mongoChatRepository
 }
 
+// ensure we always implement radiobot.Repository
+var _ radiobot.Repository = (*mongoRepository)(nil)
+
 // NewMongoRepository mongo repository
 func NewMongoRepository(podcastCollection, channelCollection, chatCollection *mgo.Collection) radiobot.Repository {
 	return &mongoRepository{
