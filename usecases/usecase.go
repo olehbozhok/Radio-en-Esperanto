@@ -219,7 +219,7 @@ func (u *usecases) FindOrRegisterChat(ch *radiobot.Chat) error {
 		}
 		return nil
 	}
-	ch = ch1
+	*ch = *ch1
 	return nil
 }
 
