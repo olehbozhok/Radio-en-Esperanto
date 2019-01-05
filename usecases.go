@@ -27,6 +27,8 @@ type Usecase interface {
 
 	// send message to one user
 	Send(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error)
+	// Respond is used to send callback responce from inline keyboard
+	Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error
 
 	// TODO: Implement in future
 	// SendPodcastToSubscribers(Podcast) error

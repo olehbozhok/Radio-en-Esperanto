@@ -199,9 +199,10 @@ func (u *usecases) Send(to telebot.Recipient, what interface{}, options ...inter
 	return u.tgBot.Send(to, what, options...)
 }
 
-//func (u *usecases) SendPodcastToSubscribers(Podcast) error{
-//
-// }
+// Respond is used to send callback responce from inline keyboard
+func (u *usecases) Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error {
+	return u.tgBot.Respond(callback, responseOptional...)
+}
 
 // FindOrRegisterChat register chat if not exist
 // if chat exist set chat data to ch from db
