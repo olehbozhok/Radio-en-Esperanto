@@ -90,6 +90,11 @@ func main() {
 func getPodcastParceAndSendFunc(usecase radiobot.Usecase) func() {
 	podcastParser := parser.NewEsperantoRadio()
 	return func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println("err recovered in podcastParser", r)
+			}
+		}()
 		log.Println("start parse podcasts")
 		podcastsAndChannels, err := podcastParser.Parse()
 		if err != nil {
