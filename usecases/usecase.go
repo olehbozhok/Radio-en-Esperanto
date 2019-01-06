@@ -204,6 +204,11 @@ func (u *usecases) EditTgMessage(message telebot.Editable, what interface{}, opt
 	return u.tgBot.Edit(message, what, options...)
 }
 
+// ForwardTgMessage behaves just like Send() but of all options it only supports Silent (see Bots API).
+func (u *usecases) ForwardTgMessage(to telebot.Recipient, what *telebot.Message, options ...interface{}) (*telebot.Message, error) {
+	return u.tgBot.Forward(to, what, options...)
+}
+
 // Respond is used to send callback responce from inline keyboard
 func (u *usecases) Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error {
 	return u.tgBot.Respond(callback, responseOptional...)

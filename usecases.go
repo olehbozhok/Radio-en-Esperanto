@@ -30,6 +30,8 @@ type Usecase interface {
 	Send(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error)
 	// EditTgMessage is magic, it lets you change already sent message.
 	EditTgMessage(message telebot.Editable, what interface{}, options ...interface{}) (*telebot.Message, error)
+	// ForwardTgMessage behaves just like Send() but of all options it only supports Silent (see Bots API).
+	ForwardTgMessage(to telebot.Recipient, what *telebot.Message, options ...interface{}) (*telebot.Message, error)
 	// Respond is used to send callback responce from inline keyboard
 	Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error
 
