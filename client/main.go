@@ -112,7 +112,7 @@ func getPodcastParceAndSendFunc(usecase radiobot.Usecase) func() {
 			}
 			for _, p := range podcasts {
 
-				err = usecase.SendAndUpdatePodcast(&p)
+				err = usecase.SendToTgChannelAndUpdatePodcast(&p)
 				if err != nil {
 					log.Println("err usecase.SendAndUpdatePodcast: ", err)
 				}

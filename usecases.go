@@ -24,7 +24,7 @@ type Usecase interface {
 
 	FindUnsendedPodcasts(count, offset int) ([]Podcast, error)
 	// send podcast to tg channel and update podcast in db
-	SendAndUpdatePodcast(*Podcast) error
+	SendToTgChannelAndUpdatePodcast(*Podcast) error
 
 	// send message to one user
 	Send(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error)

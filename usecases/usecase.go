@@ -117,8 +117,8 @@ func getDataPodcast(url string) (isMP3 bool, contentlength int64, body io.ReadCl
 }
 
 // // send podcast to tg channel and update podcast in db
-// SendAndUpdatePodcast(*Podcast) error
-func (u *usecases) SendAndUpdatePodcast(p *radiobot.Podcast) error {
+// SendToTgChannelAndUpdatePodcast(*Podcast) error
+func (u *usecases) SendToTgChannelAndUpdatePodcast(p *radiobot.Podcast) error {
 
 	podcastChannel, err := u.repo.FindChannelByID(p.ChannelID)
 	if err != nil {
