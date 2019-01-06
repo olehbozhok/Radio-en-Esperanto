@@ -35,8 +35,8 @@ type Usecase interface {
 	// Respond is used to send callback responce from inline keyboard
 	Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error
 
-	// TODO: Implement in future
-	// SendPodcastToSubscribers(Podcast) error
+	// SendPodcastToSubscribers send podcast to all chats which is subscribed on podcast channel
+	SendPodcastToSubscribers(Podcast) error
 
 	FindOrRegisterChat(*Chat) error
 	SubscribeChat(*Chat, *Channel) error

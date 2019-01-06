@@ -23,14 +23,19 @@ type usecases struct {
 	repo  radiobot.Repository
 	tgBot *telebot.Bot
 
-	tgChannel telebot.Recipient
+	// tgChannel telebot.Recipient
+	tgChannel *telebot.Chat
 }
 
 // NewUsecases create usecases
 func NewUsecases(repo radiobot.Repository, tgChannelID string, bot *telebot.Bot) radiobot.Usecase {
-	recipient := radiobot.Recipient(tgChannelID)
+	// recipient := radiobot.Recipient(tgChannelID)
+	tgChannel := &telebot.Chat{
+		Type:     telebot.ChatChannel,
+		Username: tgChannelID,
+	}
 	return &usecases{repo: repo,
-		tgChannel: &recipient,
+		tgChannel: tgChannel,
 		tgBot:     bot,
 	}
 }
@@ -212,6 +217,47 @@ func (u *usecases) ForwardTgMessage(to telebot.Recipient, what *telebot.Message,
 // Respond is used to send callback responce from inline keyboard
 func (u *usecases) Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error {
 	return u.tgBot.Respond(callback, responseOptional...)
+}
+
+func (u *usecases) SendPodcastToSubscribers(p radiobot.Podcast) error {
+	if !p.IsSended() {
+		return fmt.Errorf("error: podcast must be sended to tg channel")
+	}
+	count := 20
+	offset := 0
+	for {
+		chatIDs, err := u.repo.GetAllChatsIDSubscribedOn(&radiobot.Channel{ID: p.ChannelID}, count, offset)
+		if err != nil {
+			return err
+		}
+		if len(chatIDs) == 0 {
+			return nil
+		}
+		offset += count
+
+		for _, chatID := range chatIDs {
+			recipient := radiobot.Recipient(chatID)
+			if p.CommentMsgID != 0 {
+				_, err := u.ForwardTgMessage(&recipient, &telebot.Message{
+					ID:   p.CommentMsgID,
+					Chat: u.tgChannel,
+				})
+				if err != nil {
+					return err
+				}
+			}
+			if p.FileMsgID != 0 {
+				_, err := u.ForwardTgMessage(&recipient, &telebot.Message{
+					ID:   p.FileMsgID,
+					Chat: u.tgChannel,
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+	}
 }
 
 // FindOrRegisterChat register chat if not exist
