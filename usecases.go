@@ -1,7 +1,8 @@
 package radiobot
 
 import (
-	"github.com/google/uuid"
+	"crypto/md5"
+
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -10,7 +11,7 @@ import (
 // Создание и предобразование объектов происходит только в данных функциях.
 // Прямые обращения в базу данных в обход usecase'ов запрещены
 type Usecase interface {
-	FindChannelByID(uuid.UUID) (*Channel, error)
+	FindChannelByID([md5.Size]byte) (*Channel, error)
 	FindChannelByName(string) (*Channel, error)
 
 	// Зберегти новий канал

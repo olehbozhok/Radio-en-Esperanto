@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"bytes"
+	"crypto/md5"
 	"fmt"
 	"html"
 	"io"
@@ -12,7 +13,6 @@ import (
 
 	radiobot "github.com/Oleg-MBO/Radio-en-Esperanto"
 	"github.com/globalsign/mgo"
-	"github.com/google/uuid"
 	telebot "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -35,7 +35,7 @@ func NewUsecases(repo radiobot.Repository, tgChannelID string, bot *telebot.Bot)
 	}
 }
 
-func (u *usecases) FindChannelByID(id uuid.UUID) (*radiobot.Channel, error) {
+func (u *usecases) FindChannelByID(id [md5.Size]byte) (*radiobot.Channel, error) {
 	return u.repo.FindChannelByID(id)
 }
 
