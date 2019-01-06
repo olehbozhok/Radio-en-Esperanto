@@ -115,6 +115,12 @@ func getPodcastParceAndSendFunc(usecase radiobot.Usecase) func() {
 				err = usecase.SendToTgChannelAndUpdatePodcast(&p)
 				if err != nil {
 					log.Println("err usecase.SendAndUpdatePodcast: ", err)
+					continue
+				}
+				err := usecase.SendPodcastToSubscribers(p)
+				if err != nil {
+					log.Println("err usecase.SendPodcastToSubscribers: ", err)
+					continue
 				}
 				sendedPodcasts++
 				time.Sleep(3000 * time.Millisecond)
