@@ -194,8 +194,8 @@ func (u *usecases) SendToTgChannelAndUpdatePodcast(p *radiobot.Podcast) error {
 	return u.repo.UpdatePodcast(*p)
 }
 
-// Send message to one user
-func (u *usecases) Send(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error) {
+// SendTgMessage message to one user
+func (u *usecases) SendTgMessage(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error) {
 	return u.tgBot.Send(to, what, options...)
 }
 

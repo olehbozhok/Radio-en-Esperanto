@@ -27,7 +27,7 @@ type Usecase interface {
 	SendToTgChannelAndUpdatePodcast(*Podcast) error
 
 	// send message to one user
-	Send(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error)
+	SendTgMessage(to telebot.Recipient, what interface{}, options ...interface{}) (*telebot.Message, error)
 	// EditTgMessage is magic, it lets you change already sent message.
 	EditTgMessage(message telebot.Editable, what interface{}, options ...interface{}) (*telebot.Message, error)
 	// ForwardTgMessage behaves just like Send() but of all options it only supports Silent (see Bots API).

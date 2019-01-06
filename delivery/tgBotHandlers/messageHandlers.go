@@ -17,7 +17,7 @@ var helpMessage = "Mi brodkastas dissendi certajn podkastojn en Esperanto de htt
 // StartMessage must call on /start command
 func StartMessage(u radiobot.Usecase) func(*tb.Message) {
 	return func(m *tb.Message) {
-		u.Send(m.Chat, helpMessage)
+		u.SendTgMessage(m.Chat, helpMessage)
 	}
 }
 
@@ -34,7 +34,7 @@ func SubskribeCommand(u radiobot.Usecase, editMessage bool) func(*tb.Message) {
 
 		if err != nil {
 			log.Printf("err SubskribeCommand chat:%s, err:%#v", m.Chat.Recipient(), err)
-			u.Send(m.Chat, "happened error", &tb.SendOptions{
+			u.SendTgMessage(m.Chat, "happened error", &tb.SendOptions{
 				ReplyTo: m,
 			})
 		}
@@ -44,7 +44,7 @@ func SubskribeCommand(u radiobot.Usecase, editMessage bool) func(*tb.Message) {
 			u.EditTgMessage(m, text, &tb.ReplyMarkup{InlineKeyboard: inlineKeyboard})
 			return
 		}
-		u.Send(m.Chat, text,
+		u.SendTgMessage(m.Chat, text,
 			&tb.ReplyMarkup{InlineKeyboard: inlineKeyboard})
 	}
 }

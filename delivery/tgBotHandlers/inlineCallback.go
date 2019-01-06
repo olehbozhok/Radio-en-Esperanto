@@ -76,7 +76,7 @@ func CallbackHandler(u radiobot.Usecase) func(*tb.Callback) {
 			i, err := strconv.Atoi(data)
 			if err != nil {
 				log.Printf("err hanlde `toSubskribePage` keyboard data callback  err:%v", err)
-				u.Send(c.Message.Chat, "happened error", &tb.SendOptions{
+				u.SendTgMessage(c.Message.Chat, "happened error", &tb.SendOptions{
 					ReplyTo: c.Message,
 				})
 			}
@@ -90,12 +90,12 @@ func CallbackHandler(u radiobot.Usecase) func(*tb.Callback) {
 
 			if err != nil {
 				log.Printf("err SubskribeCommand chat:%s, err:%#v", c.Message.Chat.Recipient(), err)
-				u.Send(c.Message.Chat, "happened error", &tb.SendOptions{
+				u.SendTgMessage(c.Message.Chat, "happened error", &tb.SendOptions{
 					ReplyTo: c.Message,
 				})
 			}
 
-			u.Send(c.Message.Chat, "You can subscribe or unsubscribe using this keyboard", &tb.ReplyMarkup{
+			u.SendTgMessage(c.Message.Chat, "You can subscribe or unsubscribe using this keyboard", &tb.ReplyMarkup{
 				InlineKeyboard: inlineKeyboard,
 			})
 		default:
