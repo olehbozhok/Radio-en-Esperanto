@@ -11,6 +11,7 @@ import (
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 	tb "gopkg.in/tucnak/telebot.v2"
 
+	tgbothandlers "github.com/Oleg-MBO/Radio-en-Esperanto/delivery/tgBotHandlers"
 	"github.com/Oleg-MBO/Radio-en-Esperanto/parser"
 	"github.com/Oleg-MBO/Radio-en-Esperanto/repository"
 	"github.com/Oleg-MBO/Radio-en-Esperanto/usecases"
@@ -61,15 +62,17 @@ func main() {
 	bot, err := tb.NewBot(tb.Settings{
 		// You can also set custom API URL. If field is empty it equals to "https://api.telegram.org"
 		// URL: "http://195.129.111.17:8012",
-		// Poller: &tb.LongPoller{Timeout: 10 * time.Second},
-		Token: tgBotAPI,
+		Poller: &tb.LongPoller{Timeout: 20 * time.Second},
+		Token:  tgBotAPI,
 		Reporter: func(err error) {
-			log.Println("telegram recovered err: ", err)
+			log.Printf("telegram recovered err: %+v", err)
 		},
 	})
 	checkErr(err)
 
 	usecase := usecases.NewUsecases(repo, tgChannelID, bot)
+
+	tgbothandlers.RegisterHandlers(usecase)
 
 	runPodcastParce := getPodcastParceAndSendFunc(usecase)
 
@@ -80,7 +83,7 @@ func main() {
 	}
 	go preparedPodcastParce()
 
-	select {}
+	bot.Start()
 
 }
 
