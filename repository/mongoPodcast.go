@@ -58,7 +58,7 @@ func (rpod *mongoPodcastRepository) FindPodcastByID(p *radiobot.Podcast) error {
 // GetUnsendedPodcasts check if podcast exist
 func (rpod *mongoPodcastRepository) FindUnsendedPodcasts(count, offset int) ([]radiobot.Podcast, error) {
 	podcastList := make([]radiobot.Podcast, 0, count)
-	err := rpod.Collection.Find(bson.M{"recipient": ""}).Skip(offset).Limit(count).All(&podcastList)
+	err := rpod.Collection.Find(bson.M{"recipient": ""}).Sort("created_on").Skip(offset).Limit(count).All(&podcastList)
 	return podcastList, err
 }
 
