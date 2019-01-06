@@ -72,7 +72,7 @@ func (rchat *mongoChatRepository) GetAllChats(count, offset int) ([]*radiobot.Ch
 // GetAllChatsSubscribedOn is used to fetch all chats which subscribed on channel
 func (rchat *mongoChatRepository) GetAllChatsSubscribedOn(ch *radiobot.Channel, count, offset int) ([]*radiobot.Chat, error) {
 	chats := make([]*radiobot.Chat, count)
-	err := rchat.Collection.Find(bson.M{"subscribed_channels_id": bson.M{"$in": ch.ID}}).Skip(offset).Limit(count).All(&chats)
+	err := rchat.Collection.Find(bson.M{"subscribed_channels_id": bson.M{"$in": [][md5.Size]byte{ch.ID}}}).Skip(offset).Limit(count).All(&chats)
 	return chats, err
 }
 
