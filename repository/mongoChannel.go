@@ -42,6 +42,6 @@ func (ch *mongoChannelRepository) FindChannelByName(name string) (*radiobot.Chan
 // GetChannels is used get channels
 func (ch *mongoChannelRepository) GetChannels(count, offset int) ([]*radiobot.Channel, error) {
 	radioChannels := make([]*radiobot.Channel, 0, count)
-	err := ch.Collection.Find(bson.M{}).Skip(offset).Limit(count).All(radioChannels)
+	err := ch.Collection.Find(bson.M{}).Skip(offset).Limit(count).All(&radioChannels)
 	return radioChannels, err
 }
