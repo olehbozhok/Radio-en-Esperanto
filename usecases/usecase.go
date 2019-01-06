@@ -54,7 +54,7 @@ func (u *usecases) RegisterORFindChannel(ch *radiobot.Channel) error {
 		return err
 	}
 	if err == mgo.ErrNotFound {
-		u.repo.RegisterChannel(ch)
+		err = u.repo.RegisterChannel(ch)
 	}
 	ch = chOld
 	return err
