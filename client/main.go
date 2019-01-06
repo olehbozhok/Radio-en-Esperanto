@@ -90,6 +90,7 @@ func main() {
 func getPodcastParceAndSendFunc(usecase radiobot.Usecase) func() {
 	podcastParser := parser.NewEsperantoRadio()
 	return func() {
+		log.Println("start parse podcasts")
 		podcastsAndChannels, err := podcastParser.Parse()
 		if err != nil {
 			log.Println("err podcastParser.Parse: ", err)
@@ -126,6 +127,6 @@ func getPodcastParceAndSendFunc(usecase radiobot.Usecase) func() {
 				time.Sleep(3000 * time.Millisecond)
 			}
 		}
-		log.Println("sended podcasts ", sendedPodcasts)
+		log.Println("end parse podcasts, count sended podcasts ", sendedPodcasts)
 	}
 }
