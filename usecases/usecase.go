@@ -199,6 +199,11 @@ func (u *usecases) Send(to telebot.Recipient, what interface{}, options ...inter
 	return u.tgBot.Send(to, what, options...)
 }
 
+// EditTgMessage is magic, it lets you change already sent message.
+func (u *usecases) EditTgMessage(message telebot.Editable, what interface{}, options ...interface{}) (*telebot.Message, error) {
+	return u.tgBot.Edit(message, what, options...)
+}
+
 // Respond is used to send callback responce from inline keyboard
 func (u *usecases) Respond(callback *telebot.Callback, responseOptional ...*telebot.CallbackResponse) error {
 	return u.tgBot.Respond(callback, responseOptional...)
