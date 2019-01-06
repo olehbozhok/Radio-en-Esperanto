@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"crypto/md5"
+
 	radiobot "github.com/Oleg-MBO/Radio-en-Esperanto"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
